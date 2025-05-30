@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import { HttpCode } from "@/utils/constants";
-import authRoutes from "./routes/auth";
+import authRoutes from "@/routes/auth";
+import productRoutes from "@/routes/product";
 import path from "path";
 import Database from "@/config/database";
 
@@ -44,6 +45,7 @@ class Server {
       res.status(HttpCode.OK).json({ message: "hello server is alive" });
     });
     this.app.use("/api/auth", authRoutes);
+    this.app.use("/api/product", productRoutes);
   }
 
   private async connectToDatabase(): Promise<void> {

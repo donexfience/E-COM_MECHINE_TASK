@@ -15,14 +15,18 @@ class AuthController {
     try {
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        res.status(HttpCode.BAD_REQUEST).json({ message: "User already exists" });
+        res
+          .status(HttpCode.BAD_REQUEST)
+          .json({ message: "User already exists" });
         return;
       }
 
       const user = new User({ username, email, password });
       await user.save();
 
-      res.status(HttpCode.CREATED).json({ message: "User created successfully" });
+      res
+        .status(HttpCode.CREATED)
+        .json({ message: "User created successfully" });
     } catch (error) {
       console.error("Signup error:", error);
       res
@@ -38,7 +42,9 @@ class AuthController {
     try {
       const user: any = await User.findOne({ email });
       if (!user || !(await user.comparePassword(password))) {
-        res.status(HttpCode.BAD_REQUEST).json({ message: "Invalid credentials" });
+        res
+          .status(HttpCode.BAD_REQUEST)
+          .json({ message: "Invalid credentials" });
         return;
       }
 
@@ -59,16 +65,16 @@ class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, 
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      res.status(HttpCode.OK).json({ 
+      res.status(HttpCode.OK).json({
         message: "Login successful",
         user: {
           id: user._id.toString(),
           username: user.username,
-          email: user.email
-        }
+          role: user.role,
+        },
       });
     } catch (error) {
       console.error("Login error:", error);
@@ -93,7 +99,9 @@ class AuthController {
       const user = await validateRefreshTokenWithUser(refreshToken);
 
       if (!user) {
-        res.status(HttpCode.FORBIDDEN).json({ message: "Invalid refresh token" });
+        res
+          .status(HttpCode.FORBIDDEN)
+          .json({ message: "Invalid refresh token" });
         return;
       }
 
@@ -137,8 +145,10 @@ class AuthController {
 
   async getProfile(req: Request, res: Response): Promise<void> {
     try {
-      const user = await User.findById((req as any).user.id).select('-password -refreshToken');
-      
+      const user = await User.findById((req as any).user.id).select(
+        "-password -refreshToken"
+      );
+
       if (!user) {
         res.status(HttpCode.NOT_FOUND).json({ message: "User not found" });
         return;

@@ -20,6 +20,8 @@ const authMiddleware = async (
     const accessToken = req.cookies?.accessToken;
     const userId = req.cookies?.userId;
 
+    console.log(accessToken, userId, "got both from cookies");
+
     if (!accessToken) {
       if (!userId) {
         res.status(HttpCode.UNAUTHORIZED).json({
@@ -31,7 +33,7 @@ const authMiddleware = async (
 
       const refreshResult = await handleTokenRefreshFromDB(userId, res);
       if (!refreshResult.success) {
-        return; 
+        return;
       }
 
       req.user = refreshResult.user;
@@ -65,7 +67,7 @@ const authMiddleware = async (
 
       const refreshResult = await handleTokenRefreshFromDB(userId, res);
       if (!refreshResult.success) {
-        return; 
+        return;
       }
 
       req.user = refreshResult.user;
@@ -120,7 +122,7 @@ const handleTokenRefreshFromDB = async (
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 2 * 60 * 1000, 
+      maxAge: 2 * 60 * 1000,
     });
 
     return {
