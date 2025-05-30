@@ -18,14 +18,28 @@ const authMiddleware = async (
 ): Promise<void> => {
   try {
     const accessToken = req.cookies?.accessToken;
+    const userId = req.cookies?.userId;
+
     if (!accessToken) {
-      res.status(HttpCode.UNAUTHORIZED).json({
-        message: "Access token missing from cookies",
-        code: "TOKEN_MISSING",
-      });
+      if (!userId) {
+        res.status(HttpCode.UNAUTHORIZED).json({
+          message: "No authentication found - please login",
+          code: "NO_AUTH_FOUND",
+        });
+        return;
+      }
+
+      const refreshResult = await handleTokenRefreshFromDB(userId, res);
+      if (!refreshResult.success) {
+        return; 
+      }
+
+      req.user = refreshResult.user;
+      next();
       return;
     }
 
+    // verifying the existing access token
     try {
       const decoded = jwt.verify(
         accessToken,
@@ -39,89 +53,24 @@ const authMiddleware = async (
       next();
       return;
     } catch (err) {
-      try {
-        const expiredTokenPayload = jwt.decode(accessToken) as any;
-        if (!expiredTokenPayload || !expiredTokenPayload.id) {
-          res.clearCookie("accessToken", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-          });
-          res.status(HttpCode.UNAUTHORIZED).json({
-            message: "Invalid access token format",
-            code: "INVALID_TOKEN_FORMAT",
-          });
-          return;
-        }
-
-        const userId = expiredTokenPayload.id;
-        const user: any = await User.findById(userId).select("+refreshToken");
-
-        if (!user || !user.refreshToken) {
-          res.clearCookie("accessToken", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-          });
-          res.status(HttpCode.UNAUTHORIZED).json({
-            message: "No valid refresh token found for user",
-            code: "NO_REFRESH_TOKEN_FOUND",
-          });
-          return;
-        }
-
-        const validatedUser = await validateRefreshTokenWithUser(
-          user.refreshToken
-        );
-
-        if (!validatedUser) {
-          await User.findByIdAndUpdate(userId, {
-            $unset: { refreshToken: "" },
-          });
-          res.clearCookie("accessToken", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-          });
-          res.status(HttpCode.UNAUTHORIZED).json({
-            message: "Invalid refresh token - please login again",
-            code: "REFRESH_TOKEN_INVALID",
-          });
-          return;
-        }
-
-        const newAccessToken = generateAccessToken(
-          validatedUser._id.toString()
-        );
-
-
-        res.cookie("accessToken", newAccessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 2 * 60 * 1000,
-        });
-
-        req.user = {
-          id: validatedUser._id.toString(),
-          username: validatedUser.username,
-        };
-
-        next();
-        return;
-      } catch (decodeError) {
-        console.error("Error decoding expired token:", decodeError);
-        res.clearCookie("accessToken", {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-        });
+      // Access token expired or invalid, try to refresh using userId and database
+      if (!userId) {
+        clearAuthCookies(res);
         res.status(HttpCode.UNAUTHORIZED).json({
-          message: "Could not process expired token",
-          code: "TOKEN_DECODE_ERROR",
+          message: "Access token expired and no user ID found",
+          code: "TOKEN_EXPIRED_NO_USER_ID",
         });
         return;
       }
+
+      const refreshResult = await handleTokenRefreshFromDB(userId, res);
+      if (!refreshResult.success) {
+        return; 
+      }
+
+      req.user = refreshResult.user;
+      next();
+      return;
     }
   } catch (error) {
     console.error("Auth middleware error:", error);
@@ -131,6 +80,78 @@ const authMiddleware = async (
     });
     return;
   }
+};
+
+// Helper function to handle token refresh from database
+const handleTokenRefreshFromDB = async (
+  userId: string,
+  res: Response
+): Promise<{ success: boolean; user?: any }> => {
+  try {
+    const user: any = await User.findById(userId).select("+refreshToken");
+
+    if (!user || !user.refreshToken) {
+      clearAuthCookies(res);
+      res.status(HttpCode.UNAUTHORIZED).json({
+        message: "No valid refresh token found for user",
+        code: "NO_REFRESH_TOKEN_FOUND",
+      });
+      return { success: false };
+    }
+
+    const validatedUser = await validateRefreshTokenWithUser(user.refreshToken);
+
+    if (!validatedUser) {
+      await User.findByIdAndUpdate(userId, {
+        $unset: { refreshToken: "" },
+      });
+
+      clearAuthCookies(res);
+      res.status(HttpCode.UNAUTHORIZED).json({
+        message: "Invalid refresh token - please login again",
+        code: "REFRESH_TOKEN_INVALID",
+      });
+      return { success: false };
+    }
+
+    const newAccessToken = generateAccessToken(validatedUser._id.toString());
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 2 * 60 * 1000, 
+    });
+
+    return {
+      success: true,
+      user: {
+        id: validatedUser._id.toString(),
+        username: validatedUser.username,
+      },
+    };
+  } catch (error) {
+    console.error("Token refresh from DB error:", error);
+    clearAuthCookies(res);
+    res.status(HttpCode.UNAUTHORIZED).json({
+      message: "Token refresh failed",
+      code: "TOKEN_REFRESH_ERROR",
+    });
+    return { success: false };
+  }
+};
+
+const clearAuthCookies = (res: Response) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+  res.clearCookie("userId", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
 };
 
 export default authMiddleware;

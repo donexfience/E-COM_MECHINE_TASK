@@ -45,10 +45,31 @@ class AuthController {
       const accessToken = generateAccessToken(user._id.toString());
       const refreshToken = generateRefreshToken(user._id.toString());
 
-      user.refreshTokens = [refreshToken];
+      user.refreshToken = refreshToken;
       await user.save();
 
-      res.status(HttpCode.OK).json({ accessToken, refreshToken });
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 2 * 60 * 1000, // 2 minutes
+      });
+
+      res.cookie("userId", user._id.toString(), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, 
+      });
+
+      res.status(HttpCode.OK).json({ 
+        message: "Login successful",
+        user: {
+          id: user._id.toString(),
+          username: user.username,
+          email: user.email
+        }
+      });
     } catch (error) {
       console.error("Login error:", error);
       res
@@ -99,6 +120,12 @@ class AuthController {
         sameSite: "strict",
       });
 
+      res.clearCookie("userId", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+
       res.status(HttpCode.OK).json({ message: "Logged out successfully" });
     } catch (error) {
       console.error("Logout error:", error);
@@ -108,10 +135,9 @@ class AuthController {
     }
   }
 
-
   async getProfile(req: Request, res: Response): Promise<void> {
     try {
-      const user = await User.findById((req as any).user.id).select('-password -refreshTokens');
+      const user = await User.findById((req as any).user.id).select('-password -refreshToken');
       
       if (!user) {
         res.status(HttpCode.NOT_FOUND).json({ message: "User not found" });
