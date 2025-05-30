@@ -1,7 +1,9 @@
-import express, { Express, Request, Response } from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors'
-import morgan from 'morgan'
+import express, { Express, Request, Response } from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import morgan from "morgan";
+import { HttpCode } from "@/utils/constants";
+import authRoutes from './routes/auth';
 
 class Server {
   private app: Express;
@@ -11,7 +13,7 @@ class Server {
     dotenv.config();
 
     this.app = express();
-    this.port = parseInt(process.env.PORT || '3000',10);
+    this.port = parseInt(process.env.PORT || "3000", 10);
 
     this.configureMiddleware();
     this.configureRoutes();
@@ -31,14 +33,19 @@ class Server {
   }
 
   private configureRoutes(): void {
-    this.app.get('/', (req: Request, res: Response) => {
-      res.send('Hello, TypeScript Express Server!');
+    this.app.get("/", (req: Request, res: Response) => {
+      res.status(HttpCode.OK).json({ message: "hello server is alive" });
     });
+    this.app.use('/api/auth', authRoutes);
   }
 
   public start(): void {
     this.app.listen(this.port, () => {
-      console.log(`Server running at http://localhost:${this.port} on ${new Date().toISOString()}`);
+      console.log(
+        `Server running at http://localhost:${
+          this.port
+        } on ${new Date().toISOString()}`
+      );
     });
   }
 }
