@@ -33,10 +33,10 @@ class AuthController {
 
   // User login
   async login(req: Request, res: Response): Promise<void> {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     try {
-      const user: any = await User.findOne({ username });
+      const user: any = await User.findOne({ email });
       if (!user || !(await user.comparePassword(password))) {
         res.status(HttpCode.BAD_REQUEST).json({ message: "Invalid credentials" });
         return;
