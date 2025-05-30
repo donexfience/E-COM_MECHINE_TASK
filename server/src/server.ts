@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import { HttpCode } from "@/utils/constants";
-import authRoutes from './routes/auth';
+import authRoutes from "./routes/auth";
+import path from "path";
 
 class Server {
   private app: Express;
@@ -30,13 +31,17 @@ class Server {
       })
     );
     this.app.use(morgan("tiny"));
+    this.app.use(
+      "/uploads",
+      express.static(path.join(__dirname, "public/uploads"))
+    );
   }
 
   private configureRoutes(): void {
     this.app.get("/", (req: Request, res: Response) => {
       res.status(HttpCode.OK).json({ message: "hello server is alive" });
     });
-    this.app.use('/api/auth', authRoutes);
+    this.app.use("/api/auth", authRoutes);
   }
 
   public start(): void {
