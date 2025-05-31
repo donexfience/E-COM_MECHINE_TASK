@@ -6,6 +6,9 @@ import { HttpCode } from "@/utils/constants";
 import authRoutes from "@/routes/auth";
 import productRoutes from "@/routes/product";
 import userRoutes from "@/routes/user";
+import paymentRoutes from "@/routes/payment";
+import webhookRoutes from "@/routes/webhookRoutes";
+import purchaseRoutes from "@/routes/purchase";
 
 import path from "path";
 import Database from "@/config/database";
@@ -28,6 +31,7 @@ class Server {
   private configureMiddleware(): void {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
+    this.app.use("/webhook", webhookRoutes);
     this.app.use(express.json());
 
     this.app.use(
@@ -51,7 +55,9 @@ class Server {
     });
     this.app.use("/api/auth", authRoutes);
     this.app.use("/api/product", productRoutes);
-    this.app.use('/api/user',userRoutes)
+    this.app.use("/api/user", userRoutes);
+    this.app.use("/api/payment", paymentRoutes);
+    this.app.use("/api/purchase", purchaseRoutes);
   }
 
   private async connectToDatabase(): Promise<void> {

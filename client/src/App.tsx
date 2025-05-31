@@ -9,42 +9,38 @@ import AdminRoute from "./components/auth/AdminRoutes";
 import AdminLayout from "./components/Layout/AdminLayout";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Notfound from "./components/NotFound/Notfound";
-import Products from "./components/Admin/Product/Products";
+import Products from "./pages/Products";
+import { ToastContainer } from "react-fox-toast";
+import Checkout from "./pages/Checkout";
+import PurchaseHistory from "./components/user/purchase/PurchaseHistory";
 
 function App() {
   return (
     <Provider store={store}>
+      <ToastContainer position="top-center" />
+
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Home />} />
-
-            {/* Public product pages */}
-            {/* <Route path="product/:id" element={<ProductDetail />} /> */}
-
-            {/* Protected User Routes */}
             <Route
-              path="cart"
-              element={<ProtectedRoute>{/* <Cart /> */}</ProtectedRoute>}
-            />
-            {/* <Route
               path="checkout"
               element={
                 <ProtectedRoute>
                   <Checkout />
                 </ProtectedRoute>
               }
-            /> */}
-
-            {/* User Dashboard Routes */}
-            <Route path="user" element={<ProtectedRoute />}>
-              <Route index element={<>Usersssssssssssss</>} />
-              <Route path="profile" element={<>Profile page</>} />
-              {/* <Route path="payment" element={<Payment />} /> */}
-            </Route>
+            />
+            <Route
+              path="orders"
+              element={
+                <ProtectedRoute>
+                  <PurchaseHistory />
+                </ProtectedRoute>
+              }
+            />
           </Route>
 
-          {/* Admin Routes - Completely separate layout */}
           <Route
             path="admin"
             element={
@@ -55,9 +51,6 @@ function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<Products />} />
-            {/* <Route path="products/:id" element={<AdminProductDetail />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="orders" element={<AdminOrders />} /> */}
           </Route>
 
           {/* 404 Route */}

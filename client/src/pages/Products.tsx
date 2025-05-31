@@ -27,13 +27,13 @@ import {
   Trash2,
   ImageIcon,
 } from "lucide-react";
-import AddProduct from "./AddProduct";
+import AddProduct from "../components/Admin/Product/AddProduct";
 import {
   useAddProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
 } from "@/services/Api/productApiSlice";
-import toast from "react-hot-toast";
+import { toast } from "react-fox-toast";
 import axiosInstance from "@/services/axiosInstance";
 import { DatePicker } from "@/components/ui/date-picker";
 
@@ -516,7 +516,9 @@ const Products = () => {
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={() => setCurrentPage((prev: number) => Math.max(prev - 1, 1))}
+                onClick={() =>
+                  setCurrentPage((prev: number) => Math.max(prev - 1, 1))
+                }
                 disabled={currentPage === 1}
               >
                 Previous

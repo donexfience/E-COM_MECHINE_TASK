@@ -1,9 +1,11 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Hero1 from "@/assets/Hero1.webp";
+import banner from "@/assets/banner.webp";
 import slide1 from "@/assets/slide1.webp";
 import slide2 from "@/assets/slide.webp";
 import slide3 from "@/assets/slide3.webp";
 import { useState } from "react";
+import ProductListing from "../user/ProductLIsting";
 
 // Define the Carousel component
 interface CarouselProps {
@@ -14,11 +16,15 @@ const Carousel: React.FC<CarouselProps> = ({ slides }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? slides.length - 1 : prevIndex - 1));
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
+    );
   };
 
   const goToNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === slides.length - 1 ? 0 : prevIndex + 1));
+    setCurrentIndex((prevIndex) =>
+      prevIndex === slides.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
   return (
@@ -93,6 +99,18 @@ const HeroSection = () => {
           <div className="rounded-lg h-96 relative overflow-hidden">
             <Carousel slides={carouselSlides} />
           </div>
+        </div>
+      </div>
+      <ProductListing />
+      <div className="bg-gradient-to-r from-orange-100 to-orange-50 rounded-lg p-8 h-96 flex items-center relative overflow-hidden">
+        <img
+          src={banner}
+          alt="Hero"
+          className="absolute inset-0 w-full h-full object-cover opacity-90"
+        />
+        {/* Terms */}
+        <div className="absolute bottom-4 right-4 text-xs text-gray-600 z-10">
+          *T&C APPLY
         </div>
       </div>
     </div>

@@ -53,15 +53,14 @@ export const validateRefreshTokenWithUser = async (
 ): Promise<UserData | null> => {
   try {
     const decoded = validateRefreshToken(token);
+    console.log(decoded, "decoded in the vliadateRefreshTOkenwith user");
     if (!decoded) return null;
 
     const user: UserData | null = await User.findById(decoded.id).select(
       "+refreshToken"
     );
 
-    if (!user || user.refreshTokens !== token) {
-      return null;
-    }
+    console.log(user, "user in the validateRefresh token with user");
 
     return user;
   } catch (error) {

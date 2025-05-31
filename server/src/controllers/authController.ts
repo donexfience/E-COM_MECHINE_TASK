@@ -87,7 +87,6 @@ class AuthController {
 
   // Refresh access token
   async refreshToken(req: Request, res: Response): Promise<void> {
-    console.log(req, "req objeeeeeeeeeeeeeeeeeeee");
     const userId = req.cookies.userId;
     console.log(userId, "user id in the refresh token ");
 
@@ -98,9 +97,9 @@ class AuthController {
       const userWithRefresh = await validateRefreshTokenWithUser(
         user.refreshToken
       );
+      console.log(userWithRefresh, "user with refresh");
 
       if (!userWithRefresh) {
-        clearAuthCookies(res);
         res
           .status(HttpCode.FORBIDDEN)
           .json({ message: "Invalid refresh token" });
@@ -108,6 +107,13 @@ class AuthController {
       }
 
       const newAccessToken = generateAccessToken(user._id.toString());
+      res.cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 2 * 60 * 1000,
+        path: "/",
+      });
       res.status(HttpCode.OK).json({ accessToken: newAccessToken });
     } catch (error) {
       console.error("Refresh token error:", error);

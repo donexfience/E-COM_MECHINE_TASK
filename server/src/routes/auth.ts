@@ -1,6 +1,7 @@
 import express from "express";
 import authMiddleware from "@/middleware/authMiddleware";
 import AuthController from "@/controllers/authController";
+import authMiddlewareForInterceptor from "@/middleware/authMIddlewareForInterceptor";
 
 const router = express.Router();
 const authController = new AuthController();
@@ -13,7 +14,7 @@ router.post("/refresh", authController.refreshToken.bind(authController));
 
 router.post(
   "/logout",
-  authMiddleware,
+  authMiddlewareForInterceptor,
   authController.logout.bind(authController)
 );
 

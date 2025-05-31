@@ -55,6 +55,28 @@ class ProductController {
     }
   }
 
+  async getProductById(req: Request, res: Response): Promise<void> {
+    try {
+      const productId = req.params.id;
+      if (!productId) {
+        res
+          .status(HttpCode.BAD_REQUEST)
+          .json({ message: "product Id is requried" });
+      }
+      const product = await Product.findById(productId);
+      if (!product) {
+        res.status(HttpCode.BAD_REQUEST).json({ message: "product not found" });
+      }
+      res.status(HttpCode.OK).json(product);
+    } catch (error) {
+      console.error(error);
+      res.status(HttpCode.INTERNAL_SERVER_ERROR).json({
+        message: "Error getting  product",
+        error,
+      });
+    }
+  }
+
   // Create a new product
   async createProduct(req: Request, res: Response): Promise<void> {
     try {
