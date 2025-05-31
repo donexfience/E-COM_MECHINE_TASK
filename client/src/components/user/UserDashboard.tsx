@@ -27,7 +27,6 @@ const UserDashboard: React.FC = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* User Stats */}
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">My Orders</h3>
             <p className="text-3xl font-bold text-blue-600">12</p>
@@ -46,7 +45,6 @@ const UserDashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Orders */}
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Orders</h3>
             <div className="space-y-4">
@@ -87,7 +85,6 @@ const UserDashboard: React.FC = () => {
             </button>
           </div>
 
-          {/* Account Actions */}
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h3>
             <div className="space-y-3">

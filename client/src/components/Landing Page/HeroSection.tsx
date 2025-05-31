@@ -94,7 +94,6 @@ const HeroSection = () => {
             </div>
           </div>
         </div>
-        {/* Wall Clocks Promo - Now a Carousel */}
         <div className="relative">
           <div className="rounded-lg h-96 relative overflow-hidden">
             <Carousel slides={carouselSlides} />

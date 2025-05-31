@@ -47,10 +47,6 @@ const ProductListing = () => {
     return `₹${price}`;
   };
 
-  //   const calculateDiscount = (originalPrice: any, currentPrice: any) => {
-  //     if (!originalPrice || originalPrice <= currentPrice) return null;
-  //     return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
-  //   };
 
   if (loading) {
     return (
@@ -89,7 +85,6 @@ const ProductListing = () => {
             key={product._id}
             className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300"
           >
-            {/* Product Image */}
             <div className="relative aspect-square bg-gray-100">
               <img
                 src={
