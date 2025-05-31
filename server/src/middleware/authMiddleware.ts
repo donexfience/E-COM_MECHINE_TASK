@@ -20,7 +20,11 @@ const authMiddleware = async (
     const accessToken = req.cookies?.accessToken;
     const userId = req.cookies?.userId;
 
-    console.log(accessToken, userId, "got both from cookies");
+    console.log(
+      accessToken,
+      userId,
+      "got both from cookiesssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+    );
 
     if (!accessToken) {
       if (!userId) {
@@ -143,7 +147,7 @@ const handleTokenRefreshFromDB = async (
   }
 };
 
-const clearAuthCookies = (res: Response) => {
+export const clearAuthCookies = (res: Response) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

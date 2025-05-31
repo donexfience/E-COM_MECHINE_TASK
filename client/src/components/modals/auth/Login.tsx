@@ -8,8 +8,8 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Info, Chrome, Facebook, Apple } from "lucide-react";
 import { validateEmail, validatePassword } from "@/lib/utils";
-import { useLoginMutation } from "@/services/apiSlice";
-import { setUser } from "@/features/auth/authSlice"; 
+import { useLoginMutation } from "@/services/Api/AuthApiSlice";
+import { setUser } from "@/features/auth/authSlice";
 
 interface LoginModalProps {
   open: boolean;
@@ -138,14 +138,6 @@ const LoginModal = ({
                 </button>
               </p>
             </div>
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  {"An error occurred during login."}
-                </AlertDescription>
-              </Alert>
-            )}
 
             <form onSubmit={handleEmailLogin} className="space-y-4">
               <div className="space-y-2">

@@ -6,7 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useSignupMutation } from "@/services/apiSlice";
+import { useSignupMutation } from "@/services/Api/AuthApiSlice";
 import toast from "react-hot-toast";
 import { Navigate, useNavigate } from "react-router-dom";
 
@@ -139,14 +139,6 @@ const AuthModal = ({ open, onOpenChange, onSwitchToLogin }: AuthModalProps) => {
                 </button>
               </p>
             </div>
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  {"An error occurred during signup."}
-                </AlertDescription>
-              </Alert>
-            )}
 
             <form onSubmit={handleEmailSignup} className="space-y-4">
               <div className="space-y-2">

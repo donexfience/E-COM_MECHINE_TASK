@@ -6,12 +6,51 @@ class ProductController {
   // Get all products
   async getAllProducts(req: Request, res: Response): Promise<void> {
     try {
-      const products = await Product.find();
-      res.status(HttpCode.OK).json(products);
+      const {
+        search = "",
+        minPrice,
+        maxPrice,
+        startDate,
+        endDate,
+        page = "1",
+        limit = "10",
+      } = req.query;
+
+      const pageNumber = parseInt(page as string, 10);
+      const pageSize = parseInt(limit as string, 10);
+      const skip = (pageNumber - 1) * pageSize;
+
+      const filter: any = {};
+
+      if (search) {
+        filter.name = { $regex: search as string, $options: "i" };
+      }
+
+      if (minPrice || maxPrice) {
+        filter.price = {};
+        if (minPrice) filter.price.$gte = parseFloat(minPrice as string);
+        if (maxPrice) filter.price.$lte = parseFloat(maxPrice as string);
+      }
+
+      if (startDate || endDate) {
+        filter.createdAt = {};
+        if (startDate) filter.createdAt.$gte = new Date(startDate as string);
+        if (endDate) filter.createdAt.$lte = new Date(endDate as string);
+      }
+
+      const total = await Product.countDocuments(filter);
+      const products = await Product.find(filter).skip(skip).limit(pageSize);
+
+      res.status(200).json({
+        total,
+        page: pageNumber,
+        pageSize,
+        products,
+      });
     } catch (error) {
-      res.status(HttpCode.INTERNAL_SERVER_ERROR).json({ 
-        message: "Error fetching products", 
-        error 
+      res.status(500).json({
+        message: "Error fetching products",
+        error,
       });
     }
   }
@@ -20,8 +59,15 @@ class ProductController {
   async createProduct(req: Request, res: Response): Promise<void> {
     try {
       const { name, price, description, stockQuantity } = req.body;
+      console.log(req.file, "fiele in the createproduct");
       const imagePath = req.file?.filename;
-
+      console.log(imagePath, "image path");
+      const existingProduct = await Product.findOne({ name: name });
+      if (existingProduct) {
+        res
+          .status(HttpCode.BAD_REQUEST)
+          .json({ message: "Product with this name already exist" });
+      }
       if (!imagePath) {
         res.status(HttpCode.BAD_REQUEST).json({ message: "Image is required" });
         return;
@@ -31,16 +77,16 @@ class ProductController {
         name,
         price,
         description,
-        imagePath: `/uploads/${imagePath}`,
+        imageURL: `/uploads/${imagePath}`,
         stockQuantity,
       });
 
       await product.save();
       res.status(HttpCode.CREATED).json(product);
     } catch (error) {
-      res.status(HttpCode.INTERNAL_SERVER_ERROR).json({ 
-        message: "Error creating product", 
-        error 
+      res.status(HttpCode.INTERNAL_SERVER_ERROR).json({
+        message: "Error creating product",
+        error,
       });
     }
   }
@@ -56,8 +102,8 @@ class ProductController {
       }
 
       const product = await Product.findByIdAndUpdate(
-        req.params.id, 
-        updateData, 
+        req.params.id,
+        updateData,
         { new: true }
       );
 
@@ -68,9 +114,9 @@ class ProductController {
 
       res.status(HttpCode.OK).json(product);
     } catch (error) {
-      res.status(HttpCode.INTERNAL_SERVER_ERROR).json({ 
-        message: "Error updating product", 
-        error 
+      res.status(HttpCode.INTERNAL_SERVER_ERROR).json({
+        message: "Error updating product",
+        error,
       });
     }
   }
@@ -79,7 +125,7 @@ class ProductController {
   async deleteProduct(req: Request, res: Response): Promise<void> {
     try {
       const product = await Product.findByIdAndDelete(req.params.id);
-      
+
       if (!product) {
         res.status(HttpCode.NOT_FOUND).json({ message: "Product not found" });
         return;
@@ -87,9 +133,9 @@ class ProductController {
 
       res.status(HttpCode.OK).json({ message: "Product deleted successfully" });
     } catch (error) {
-      res.status(HttpCode.INTERNAL_SERVER_ERROR).json({ 
-        message: "Error deleting product", 
-        error 
+      res.status(HttpCode.INTERNAL_SERVER_ERROR).json({
+        message: "Error deleting product",
+        error,
       });
     }
   }

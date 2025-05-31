@@ -17,10 +17,5 @@ router.post(
   authController.logout.bind(authController)
 );
 
-router.get(
-  "/profile",
-  authMiddleware,
-  authController.getProfile.bind(authController)
-);
 
 export default router;

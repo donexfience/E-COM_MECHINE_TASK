@@ -13,14 +13,14 @@ const AdminHeader = () => {
   };
   return (
     <div>
-      <div className="bg-white shadow">
+      <div className="bg-slate-900 shadow">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-800">
+            <h1 className="text-2xl font-bold text-white">
               Admin Dashboard
             </h1>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
+            <div className="flex items-center space-x-4 text-white">
+              <span className="text-sm ">
                 Welcome, {user.name}
               </span>
               <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">
@@ -29,7 +29,7 @@ const AdminHeader = () => {
 
               {user ? (
                 <>
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm ">
                     Hello, {user.username}
                   </span>
                   <Button

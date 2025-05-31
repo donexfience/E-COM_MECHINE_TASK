@@ -10,22 +10,24 @@ router.get("/", productController.getAllProducts.bind(productController));
 
 router.post(
   "/",
-  authMiddleware,
-  upload.single("image"),
+  (req, res, next) => {
+    upload.single("productImage")(req, res, (err) => {
+      if (err) {
+        console.error("Multer error:", err.message);
+        return res.status(400).json({ message: err.message });
+      }
+      next();
+    });
+  },
   productController.createProduct.bind(productController)
 );
-
 router.put(
   "/:id",
-  authMiddleware,
-  upload.single("image"),
+  upload.single("productImage"),
   productController.updateProduct.bind(productController)
 );
 
-router.delete(
-  "/:id",
-  authMiddleware,
-  productController.deleteProduct.bind(productController)
-);
+router.delete("/:id", productController.deleteProduct.bind(productController));
 
 export default router;
+  

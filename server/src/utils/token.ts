@@ -3,9 +3,13 @@ import { UserData } from "@/types/Iuser";
 import jwt from "jsonwebtoken";
 
 export const generateAccessToken = (userId: string): string => {
-  return jwt.sign({ id: userId }, process.env.JWT_ACCESS_SECRET || "your_jwt_secret", {
-    expiresIn: "2m",
-  });
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_ACCESS_SECRET || "your_jwt_secret",
+    {
+      expiresIn: "2m",
+    }
+  );
 };
 
 export const generateRefreshToken = (userId: string): string => {
@@ -31,6 +35,7 @@ export const validateAccessToken = (token: string): { id: string } | null => {
 };
 
 export const validateRefreshToken = (token: string): { id: string } | null => {
+  console.log(token, "refreshtoken", process.env.JWT_REFRESH_SECRET);
   try {
     const decoded = jwt.verify(
       token,
@@ -50,12 +55,14 @@ export const validateRefreshTokenWithUser = async (
     const decoded = validateRefreshToken(token);
     if (!decoded) return null;
 
-    const user: UserData | null = await User.findById(decoded.id).select("+refreshToken");
-    
-    if (!user || user.refreshTokens!== token) {
+    const user: UserData | null = await User.findById(decoded.id).select(
+      "+refreshToken"
+    );
+
+    if (!user || user.refreshTokens !== token) {
       return null;
     }
-    
+
     return user;
   } catch (error) {
     console.error("Refresh token with user validation error:", error);

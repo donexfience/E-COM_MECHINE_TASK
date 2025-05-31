@@ -6,6 +6,7 @@ import {
   generateRefreshToken,
   validateRefreshTokenWithUser,
 } from "@/utils/token";
+import { clearAuthCookies } from "@/middleware/authMiddleware";
 
 class AuthController {
   // User signup
@@ -86,19 +87,20 @@ class AuthController {
 
   // Refresh access token
   async refreshToken(req: Request, res: Response): Promise<void> {
-    const { refreshToken } = req.body;
+    console.log(req, "req objeeeeeeeeeeeeeeeeeeee");
+    const userId = req.cookies.userId;
+    console.log(userId, "user id in the refresh token ");
 
-    if (!refreshToken) {
-      res
-        .status(HttpCode.UNAUTHORIZED)
-        .json({ message: "Refresh token required" });
-      return;
-    }
+    const user: any = await User.findById(userId).select("+refreshToken");
+    console.log(user, "user got in the refresh token ");
 
     try {
-      const user = await validateRefreshTokenWithUser(refreshToken);
+      const userWithRefresh = await validateRefreshTokenWithUser(
+        user.refreshToken
+      );
 
-      if (!user) {
+      if (!userWithRefresh) {
+        clearAuthCookies(res);
         res
           .status(HttpCode.FORBIDDEN)
           .json({ message: "Invalid refresh token" });

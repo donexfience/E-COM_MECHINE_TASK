@@ -9,6 +9,7 @@ import AdminRoute from "./components/auth/AdminRoutes";
 import AdminLayout from "./components/Layout/AdminLayout";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Notfound from "./components/NotFound/Notfound";
+import Products from "./components/Admin/Product/Products";
 
 function App() {
   return (
@@ -53,7 +54,7 @@ function App() {
             }
           >
             <Route index element={<AdminDashboard />} />
-            <Route path="products" element={<div>Products</div>} />
+            <Route path="products" element={<Products />} />
             {/* <Route path="products/:id" element={<AdminProductDetail />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="orders" element={<AdminOrders />} /> */}

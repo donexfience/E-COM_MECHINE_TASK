@@ -5,9 +5,11 @@ import morgan from "morgan";
 import { HttpCode } from "@/utils/constants";
 import authRoutes from "@/routes/auth";
 import productRoutes from "@/routes/product";
+import userRoutes from "@/routes/user";
+
 import path from "path";
 import Database from "@/config/database";
-
+import cookieParser from "cookie-parser";
 class Server {
   private app: Express;
   private port: number;
@@ -24,8 +26,10 @@ class Server {
   }
 
   private configureMiddleware(): void {
-    this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(cookieParser());
+    this.app.use(express.json());
+
     this.app.use(
       cors({
         origin: ["http://localhost:5173"],
@@ -42,10 +46,12 @@ class Server {
 
   private configureRoutes(): void {
     this.app.get("/", (req: Request, res: Response) => {
+      console.log(req.files, "request file");
       res.status(HttpCode.OK).json({ message: "hello server is alive" });
     });
     this.app.use("/api/auth", authRoutes);
     this.app.use("/api/product", productRoutes);
+    this.app.use('/api/user',userRoutes)
   }
 
   private async connectToDatabase(): Promise<void> {

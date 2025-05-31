@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import axiosBaseQuery from './baseQuery';
+import axiosBaseQuery from '../baseQuery';
 import { logoutUser, setUser } from '@/features/auth/authSlice';
 
 

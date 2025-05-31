@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({
   onOpenLoginModal,
   onOpenSignupModal,
 }) => {
-  const user: any = useSelector((state: RootState) => state.auth.user);
+  const user: any = useSelector((state: any) => state.auth.user);
   const dispatch = useDispatch();
 
   const topLinks = [
