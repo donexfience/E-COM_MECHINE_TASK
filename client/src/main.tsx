@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store.ts";
+import { ToastBar } from "react-hot-toast";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

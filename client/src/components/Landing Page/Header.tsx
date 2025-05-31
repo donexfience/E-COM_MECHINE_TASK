@@ -1,5 +1,4 @@
-// Header.tsx
-import React, { useState } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Search,
@@ -11,16 +10,19 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import LoginModal from "../modals/Login";
-import AuthModal from "../modals/signup";
 import { logoutUser } from "@/features/auth/authSlice";
 import type { RootState } from "@/store";
 
-const Header: React.FC = () => {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+interface HeaderProps {
+  onOpenLoginModal?: () => void;
+  onOpenSignupModal?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({
+  onOpenLoginModal,
+  onOpenSignupModal,
+}) => {
   const user: any = useSelector((state: RootState) => state.auth.user);
-  console.log(user,"user got in header")
   const dispatch = useDispatch();
 
   const topLinks = [
@@ -31,16 +33,6 @@ const Header: React.FC = () => {
     "TRACK YOUR ORDER",
     "CONTACT US",
   ];
-
-  const handleSwitchToSignup = () => {
-    setIsLoginModalOpen(false);
-    setIsAuthModalOpen(true);
-  };
-
-  const handleSwitchToLogin = () => {
-    setIsAuthModalOpen(false);
-    setIsLoginModalOpen(true);
-  };
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -87,6 +79,16 @@ const Header: React.FC = () => {
                   <span className="text-sm text-gray-700">
                     Hello, {user.username}
                   </span>
+                  {user.role === "admin" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-blue-600 border-blue-600"
+                      onClick={() => window.open("/admin", "_blank")}
+                    >
+                      Admin Panel
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -103,7 +105,7 @@ const Header: React.FC = () => {
                     variant="outline"
                     size="sm"
                     className="text-gray-700"
-                    onClick={() => setIsAuthModalOpen(true)}
+                    onClick={onOpenSignupModal}
                   >
                     Sign Up Now
                   </Button>
@@ -111,7 +113,7 @@ const Header: React.FC = () => {
                     variant="outline"
                     size="sm"
                     className="text-gray-700"
-                    onClick={() => setIsLoginModalOpen(true)}
+                    onClick={onOpenLoginModal}
                   >
                     Sign In
                   </Button>
@@ -132,17 +134,6 @@ const Header: React.FC = () => {
           </div>
         </div>
       </div>
-
-      <AuthModal
-        open={isAuthModalOpen}
-        onOpenChange={setIsAuthModalOpen}
-        onSwitchToLogin={handleSwitchToLogin}
-      />
-      <LoginModal
-        open={isLoginModalOpen}
-        onOpenChange={setIsLoginModalOpen}
-        onSwitchToSignup={handleSwitchToSignup}
-      />
     </div>
   );
 };

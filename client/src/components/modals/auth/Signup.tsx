@@ -1,30 +1,31 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { validateEmail, validatePassword, validateUsername } from "@/lib/utils";
+import { Apple, Chrome, Eye, EyeOff, Facebook, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Eye, EyeOff, Info, Chrome, Facebook, Apple } from "lucide-react";
-import { validateEmail, validatePassword } from "@/lib/utils";
-import { useLoginMutation } from "@/services/apiSlice";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useSignupMutation } from "@/services/apiSlice";
+import toast from "react-hot-toast";
+import { Navigate, useNavigate } from "react-router-dom";
 
-interface LoginModalProps {
+interface AuthModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSwitchToSignup?: () => void;
+  onSwitchToLogin: () => void;
 }
 
-const LoginModal = ({
-  open,
-  onOpenChange,
-  onSwitchToSignup,
-}: LoginModalProps) => {
+const AuthModal = ({ open, onOpenChange, onSwitchToLogin }: AuthModalProps) => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [signup, { isLoading, error }] = useSignupMutation();
 
   const socialProviders = [
     {
@@ -44,9 +45,18 @@ const LoginModal = ({
     },
   ];
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     let isValid = true;
+
+    if (!validateUsername(username)) {
+      setUsernameError(
+        "Username must be at least 3 characters and contain only letters and numbers."
+      );
+      isValid = false;
+    } else {
+      setUsernameError("");
+    }
 
     if (!validateEmail(email)) {
       setEmailError("Please enter a valid email address.");
@@ -55,22 +65,23 @@ const LoginModal = ({
       setEmailError("");
     }
 
-    if (!password) {
-      setPasswordError("Password is required.");
+    if (!validatePassword(password)) {
+      setPasswordError(
+        "Password must be at least 8 characters and include a letter, a number, and a special character."
+      );
       isValid = false;
-    // } else if (!validatePassword(password)) {
-    //   setPasswordError("Password is not valid.");
-    //   isValid = false;
     } else {
       setPasswordError("");
     }
 
     if (isValid) {
       try {
-        await login({ email, password }).unwrap();
-        onOpenChange(false); 
+        await signup({ username, email, password }).unwrap();
+        toast.success("login successfull ");
+        navigate("/");
+        onOpenChange(false);
       } catch (err) {
-        console.error("Login failed:", err);
+        console.error("Signup failed:", err);
       }
     }
   };
@@ -82,11 +93,12 @@ const LoginModal = ({
           <Alert className="bg-blue-700 border-blue-500 text-white mb-3">
             <Info className="h-4 w-4" />
             <AlertDescription className="text-white">
-              Please enter your credentials to log in.
+              For your protection, please verify your identity.
             </AlertDescription>
           </Alert>
+          <div className="text-sm text-blue-100 mb-1">Step 1 of 2</div>
           <DialogTitle className="text-2xl font-semibold text-white">
-            Sign in to your account
+            Create an account
           </DialogTitle>
         </div>
 
@@ -115,15 +127,15 @@ const LoginModal = ({
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-1">
-                Sign in with email
+                Sign up with email
               </h3>
               <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
+                Already have an account?{" "}
                 <button
                   className="text-blue-600 hover:text-blue-700 font-medium"
-                  onClick={onSwitchToSignup}
+                  onClick={onSwitchToLogin}
                 >
-                  Sign up
+                  Sign in
                 </button>
               </p>
             </div>
@@ -131,12 +143,32 @@ const LoginModal = ({
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>
-                  { "An error occurred during login."}
+                  {"An error occurred during signup."}
                 </AlertDescription>
               </Alert>
             )}
 
-            <form onSubmit={handleEmailLogin} className="space-y-4">
+            <form onSubmit={handleEmailSignup} className="space-y-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="username"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Username
+                </Label>
+                <Input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full h-11"
+                  required
+                />
+                {usernameError && (
+                  <p className="text-red-500 text-sm">{usernameError}</p>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <Label
                   htmlFor="email"
@@ -188,11 +220,6 @@ const LoginModal = ({
                 {passwordError && (
                   <p className="text-red-500 text-sm">{passwordError}</p>
                 )}
-                <div className="text-sm">
-                  <button className="text-blue-600 hover:text-blue-700 font-medium">
-                    Forgot password?
-                  </button>
-                </div>
               </div>
 
               <Button
@@ -200,7 +227,7 @@ const LoginModal = ({
                 className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
                 disabled={isLoading}
               >
-                {isLoading ? "Signing in..." : "Sign in"}
+                {isLoading ? "Signing up..." : "Continue"}
               </Button>
             </form>
           </div>
@@ -210,4 +237,4 @@ const LoginModal = ({
   );
 };
 
-export default LoginModal;
+export default AuthModal;
