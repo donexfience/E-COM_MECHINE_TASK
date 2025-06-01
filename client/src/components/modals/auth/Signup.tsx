@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useSignupMutation } from "@/services/Api/AuthApiSlice";
 import toast from "react-hot-toast";
-import { Navigate, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 
 interface AuthModalProps {
   open: boolean;
@@ -25,7 +25,7 @@ const AuthModal = ({ open, onOpenChange, onSwitchToLogin }: AuthModalProps) => {
   const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [signup, { isLoading, error }] = useSignupMutation();
+  const [signup, { isLoading }] = useSignupMutation();
 
   const socialProviders = [
     {

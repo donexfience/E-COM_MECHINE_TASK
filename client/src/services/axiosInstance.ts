@@ -21,7 +21,7 @@ export const setupInterceptors = (store: any) => {
         try {
           console.log("Attempting to refresh token...");
           const response = await axiosInstance.post("/auth/refresh");
-          console.log("Token refresh successful");
+          console.log("Token refresh successful", response);
           await new Promise((resolve) => setTimeout(resolve, 100));
           return axiosInstance(originalRequest);
         } catch (refreshError) {

@@ -1,4 +1,3 @@
-import React from "react";
 import notfoundImage from "@/assets/NT.png";
 
 const Notfound = () => {

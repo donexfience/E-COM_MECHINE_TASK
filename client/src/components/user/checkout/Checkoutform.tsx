@@ -1,15 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { loadStripe } from "@stripe/stripe-js";
+import  { useState, useEffect } from "react";
 import {
-  Elements,
   CardElement,
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
 import {
-  ArrowLeft,
   CreditCard,
   Lock,
   CheckCircle,

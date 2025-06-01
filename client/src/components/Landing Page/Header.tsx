@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { logoutUser } from "@/features/auth/authSlice";
-import type { RootState } from "@/store";
 
 interface HeaderProps {
   onOpenLoginModal?: () => void;

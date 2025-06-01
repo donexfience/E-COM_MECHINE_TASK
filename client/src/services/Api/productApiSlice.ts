@@ -20,7 +20,7 @@ export const productApi = createApi({
         method: "POST",
         body: formData,
       }),
-      async onQueryStarted(formData, { dispatch, queryFulfilled }) {
+      async onQueryStarted( { dispatch, queryFulfilled }) {
         try {
           const { data: newProduct } = await queryFulfilled;
           
@@ -42,7 +42,7 @@ export const productApi = createApi({
         method: "PUT",
         body: formData,
       }),
-      async onQueryStarted({ id, formData }, { dispatch, queryFulfilled }) {
+      async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
         try {
           const { data: updatedProduct } = await queryFulfilled;
           dispatch(

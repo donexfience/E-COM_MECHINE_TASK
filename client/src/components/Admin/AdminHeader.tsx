@@ -1,5 +1,4 @@
 import { logoutUser } from "@/features/auth/authSlice";
-import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { LogOut } from "lucide-react";

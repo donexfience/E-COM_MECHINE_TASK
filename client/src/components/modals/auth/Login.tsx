@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Info, Chrome, Facebook, Apple } from "lucide-react";
-import { validateEmail, validatePassword } from "@/lib/utils";
+import { validateEmail } from "@/lib/utils";
 import { useLoginMutation } from "@/services/Api/AuthApiSlice";
 import { setUser } from "@/features/auth/authSlice";
 
@@ -30,7 +30,7 @@ const LoginModal = ({
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [login, { isLoading}] = useLoginMutation();
 
   const socialProviders = [
     {
